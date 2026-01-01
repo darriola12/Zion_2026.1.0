@@ -1,0 +1,16 @@
+.layout-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 1fr auto;
+  min-height: 100vh;
+}
+
+.sidebar {
+  grid-row: 1 / span 2;
+}
+
+.layout-main {
+  padding: 24px;
+  overflow-y: auto;
+  background: #fff;
+}
