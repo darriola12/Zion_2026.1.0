@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
-import "../styles/sidebar.css";
+import "../styles/Sidebar.css";
 
 const Sidebar = () => {
   const [openData, setOpenData] = useState(false);
