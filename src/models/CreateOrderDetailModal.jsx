@@ -2,229 +2,114 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/superbase";
 import "../styles/order.css";
 
-const CreateOrderDetailsModal = ({ customerId, onClose, onCreated, orderData }) => {
-  const [subtotal, setSubtotal] = useState("");
-  const [discount, setDiscount] = useState("0");
-  const [items, setItems] = useState([{ name: "", description: "", price: "", quantity: 1 }]);
-  const [loading, setLoading] = useState(false);
+const OrderDetailsModal = ({ orderId, onClose }) => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Cargar datos del pedido si es edición
   useEffect(() => {
-    console.log("CreateOrderDetailsModal useEffect fired, orderData:", orderData);
+    if (!orderId) return;
 
-    if (!orderData || !orderData.id) {
-      console.log("No orderData o falta id:", orderData);
-      return;
-    }
+    const fetchDetails = async () => {
+      setLoading(true);
+      setError(null);
 
-    const loadOrderDetails = async () => {
       try {
-        const { data: details, error: detailsError } = await supabase
+        const { data, error } = await supabase
           .from("order_details")
-          .select("id, name, description, price, quantity, order_id")
-          .eq("order_id", orderData.id);
+          .select(`*`)
+          .eq("order_id", orderId)
 
-        if (detailsError) {
-          console.error("Supabase details error:", detailsError);
-          setError("No se pudieron cargar los detalles del pedido");
-          return;
-        }
+        if (error) throw error;
 
-        setSubtotal(String(orderData.Subtotal ?? 0));
-        setDiscount(String(orderData.Discount ?? 0));
-
-        if (!details || details.length === 0) {
-          setItems([{ name: "", description: "", price: "", quantity: 1 }]);
-        } else {
-          setItems(
-            details.map(item => ({
-              name: item.name ?? "",
-              description: item.description ?? "",
-              price: item.price != null ? String(item.price) : "",
-              quantity: item.quantity != null ? Number(item.quantity) : 1,
-            }))
-          );
-        }
+        setItems(data || []);
       } catch (err) {
-        console.error("Error cargando detalles:", err);
-        setError("No se pudieron cargar los detalles del pedido");
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadOrderDetails();
-  }, [orderData]);
-
-  // Calcular total automáticamente
-  const total =
-    items.reduce((acc, item) => acc + Number(item.price || 0) * Number(item.quantity || 1), 0) -
-    Number(discount || 0);
-
-  // ➕ agregar producto
-  const addItem = () => setItems([...items, { name: "", description: "", price: "", quantity: 1 }]);
-
-  // ❌ eliminar producto
-  const removeItem = index => setItems(items.filter((_, i) => i !== index));
-
-  // ✏️ editar producto
-  const updateItem = (index, field, value) => {
-    const updated = [...items];
-    updated[index][field] = value;
-    setItems(updated);
-  };
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    if (!customerId) {
-      setError("Customer ID inválido");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      let order;
-
-      if (orderData?.id) {
-        // EDITAR ORDEN
-        const { data: updatedOrder, error: updateError } = await supabase
-          .from("Order")
-          .update({
-            Subtotal: Number(subtotal),
-            Discount: Number(discount),
-            Total: total,
-          })
-          .eq("id", orderData.id)
-          .select()
-          .single();
-
-        if (updateError) throw updateError;
-        order = updatedOrder;
-
-        // Eliminar detalles anteriores
-        await supabase.from("order_details").delete().eq("order_id", order.id);
-      } else {
-        // CREAR NUEVA ORDEN
-        const { data: newOrder, error: orderError } = await supabase
-          .from("Order")
-          .insert([
-            {
-              Order_customer_id: Number(customerId),
-              Subtotal: Number(subtotal),
-              Discount: Number(discount),
-              Total: total,
-            },
-          ])
-          .select()
-          .single();
-
-        if (orderError) throw orderError;
-        order = newOrder;
-      }
-
-      // Insertar detalles
-      const details = items.map(item => ({
-        order_id: order.id,
-        name: item.name,
-        description: item.description,
-        price: Number(item.price),
-        quantity: Number(item.quantity),
-      }));
-
-      const { error: detailsError } = await supabase.from("order_details").insert(details);
-      if (detailsError) throw detailsError;
-
-      onCreated();
-      onClose();
-    } catch (err) {
-      setError(err.message);
-    }
-
-    setLoading(false);
-  };
+    fetchDetails();
+  }, [orderId]);
 
   return (
     <div className="modal-overlay">
-      <div className="modal-box">
+      <div className="modal-box small">
         <button className="modal-close" onClick={onClose}>
           ✕
         </button>
-        <h2>{orderData ? "Editar Orden" : "Crear Orden"}</h2>
 
+        <h2>Detalles de la Orden</h2>
+
+        {loading && <p>Cargando...</p>}
         {error && <p className="error">{error}</p>}
 
-        <form className="modal-form" onSubmit={handleSubmit}>
-          <input
-            type="number"
-            placeholder="Subtotal"
-            value={subtotal}
-            onChange={e => setSubtotal(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Discount"
-            value={discount}
-            onChange={e => setDiscount(e.target.value)}
-          />
-          <input type="number" value={total.toFixed(2)} readOnly />
+        {!loading && !error && items.length === 0 && (
+          <p>No hay productos en esta orden.</p>
+        )}
 
-          <hr />
+        {!loading && !error && items.length > 0 && (
+          <div className="modal-table-wrapper">
+            <table className="details-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th>Imagen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => 
+                  <tr key={item.id}>
+                    <td>{item.name}</td>
+                    <td>{item.description || "-"}</td>
+                    <td>${item.price}</td>
+                    <td>{item.quantity}</td>
+                    <td>${item.price * item.quantity}</td>
+                    <td>
+                       {item.image ? (
+                         <a
+                           href={item.image}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           title="Ver imagen en tamaño completo"
+                         >
+                           <img
+                             src={item.image}
+                             alt={item.name}
+                             style={{
+                               width: 120,
+                               height: 120,
+                               objectFit: "cover",
+                               borderRadius: 10,
+                               cursor: "pointer",
+                             }}
+                           />
+                         </a>
+                       ) : (
+                         <span>Sin imagen</span>
+                       )}
+                    </td>
 
-          <h3>Productos</h3>
-          {items.map((item, index) => (
-            <div key={index} className="order-item">
-              <input
-                placeholder="Nombre"
-                value={item.name}
-                onChange={e => updateItem(index, "name", e.target.value)}
-                required
-              />
-              <input
-                placeholder="Descripción"
-                value={item.description}
-                onChange={e => updateItem(index, "description", e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Precio"
-                value={item.price}
-                onChange={e => updateItem(index, "price", e.target.value)}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Cantidad"
-                value={item.quantity}
-                min="1"
-                onChange={e => updateItem(index, "quantity", e.target.value)}
-              />
-              {items.length > 1 && (
-                <button type="button" className="btn-secondary" onClick={() => removeItem(index)}>
-                  Eliminar
-                </button>
-              )}
-            </div>
-          ))}
-
-          <button type="button" className="btn-secondary" onClick={addItem}>
-            + Agregar producto
-          </button>
-
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              Cancelar
-            </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Guardando..." : orderData ? "Actualizar Orden" : "Crear Orden"}
-            </button>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </form>
+        )}
+
+        <div className="modal-actions">
+          <button className="btn-secondary" onClick={onClose}>
+            Cerrar
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default CreateOrderDetailsModal;
+export default OrderDetailsModal;
