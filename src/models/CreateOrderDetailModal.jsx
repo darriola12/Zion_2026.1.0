@@ -96,7 +96,7 @@ const OrderDetailsModal = ({ orderId, onClose }) => {
                     </td>
 
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
