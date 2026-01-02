@@ -1,0 +1,123 @@
+/* =========================
+   GENERAL
+   ========================= */
+.orders-container {
+  padding: 24px;
+  font-family: Arial, sans-serif;
+
+  /* 🔥 CLAVE */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ⛔ evita scroll global */
+}
+
+/* HEADER */
+.orders-container h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   TABLE WRAPPER (SCROLL SOLO AQUÍ)
+   ========================= */
+.table-wrapper {
+  flex: 1; /* ocupa todo el espacio restante */
+  overflow-y: auto; /* ✅ scroll SOLO aquí */
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  background: white;
+}
+
+/* =========================
+   TABLE
+   ========================= */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table th {
+  background: #f3f4f6;
+  text-align: left;
+  padding: 12px;
+  font-size: 14px;
+
+  /* 🔒 header fijo */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.orders-table td {
+  padding: 12px;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+}
+
+.orders-table tr:hover {
+  background: #f9fafb;
+}
+
+/* =========================
+   STATUS
+   ========================= */
+.status {
+  padding: 16px;
+}
+
+.status.error {
+  color: #dc2626;
+}
+
+/* =========================
+   📱 MOBILE – TABLE → CARDS
+   ========================= */
+@media (max-width: 768px) {
+
+  .orders-container {
+    height: auto;
+    overflow: visible;
+  }
+
+  .table-wrapper {
+    overflow: visible;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .orders-table,
+  .orders-table thead {
+    display: none;
+  }
+
+  .orders-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .orders-table tr {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .orders-table td {
+    border: none;
+    padding: 0;
+    font-size: 15px;
+  }
+
+  .orders-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    color: #374151;
+    font-size: 13px;
+  }
+}

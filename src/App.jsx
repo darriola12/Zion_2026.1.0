@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Missions from "./pages/Missions";
 import Customer from "./pages/Customer";
 import CustomerDetail from "./pages/CustomerDetails"; 
+import OrdersPage from "./pages/Orders";
 
 
 
@@ -16,7 +17,7 @@ function App() {
         <Route path= "/data/missions" element = {<Missions/>} />
         <Route path= "/data/customers" element = {<Customer/>} />
         <Route path= "/data/customers/detail/:id" element = {<CustomerDetail/>} />
-        
+        <Route path= "/orders" element = {<OrdersPage/>} />
       </Route>
     </Routes>
   );
