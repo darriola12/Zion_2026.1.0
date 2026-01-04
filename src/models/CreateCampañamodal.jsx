@@ -58,7 +58,7 @@ const CreateCampañaModal = ({ onClose, onCreated }) => {
             type="text"
             placeholder="Nombre de la campaña"
             value={campaña}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setCampaña(e.target.value)}
             required
           />
 
