@@ -54,6 +54,13 @@ const Sidebar = () => {
             >
               Customers
             </NavLink>
+            <NavLink
+              to="/data/campañas"
+              className="sidebar__sublink"
+            >
+              Campañas
+            </NavLink>
+
           </div>
         )}
       </nav>

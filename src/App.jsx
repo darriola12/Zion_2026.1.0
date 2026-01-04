@@ -5,7 +5,7 @@ import Missions from "./pages/Missions";
 import Customer from "./pages/Customer";
 import CustomerDetail from "./pages/CustomerDetails"; 
 import OrdersPage from "./pages/Orders";
-
+import CampañasPage from "./pages/campaña";
 
 
 
@@ -18,6 +18,7 @@ function App() {
         <Route path= "/data/customers" element = {<Customer/>} />
         <Route path= "/data/customers/detail/:id" element = {<CustomerDetail/>} />
         <Route path= "/orders" element = {<OrdersPage/>} />
+        <Route path= "/data/campañas" element = {<CampañasPage/>} />
       </Route>
     </Routes>
   );
