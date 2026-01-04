@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/superbase";
+import useCampañas from "../hooks/useCampanas";
 import "../styles/order.css";
 
+/* =============================
+   OPCIONES DE PRODUCTOS
+============================= */
 const PRODUCT_OPTIONS = [
   "Corbata Típica",
   "Corbata Flores",
@@ -21,33 +25,48 @@ const PRODUCT_OPTIONS = [
   "Mochila",
 ];
 
+/* =============================
+   COMPONENTE
+============================= */
 const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
+  /* =============================
+     HOOKS
+  ============================== */
+
+  // 🔹 campañas desde Supabase
+  const { campañas, loading: loadingCampañas } = useCampañas();
+
+  // 🔹 estados principales
   const [discount, setDiscount] = useState("0");
-  const [items, setItems] = useState([
-    { name: "", description: "", price: "", quantity: 1, image: "", file: null },
-  ]);
+  const [campañaId, setCampañaId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // 🔹 items de la orden
+  const [items, setItems] = useState([
+    { name: "", description: "", price: "", quantity: 1, image: "", file: null },
+  ]);
+
   /* =============================
-     CARGAR DATOS PARA EDICIÓN
+     CARGAR DATOS (EDICIÓN)
   ============================== */
   useEffect(() => {
-    if (orderData) {
-      setDiscount(orderData.Discount ?? "0");
+    if (!orderData) return;
 
-      if (orderData.details?.length) {
-        setItems(
-          orderData.details.map((d) => ({
-            name: d.name,
-            description: d.description,
-            price: d.price,
-            quantity: d.quantity,
-            image: d.image || "",
-            file: null,
-          }))
-        );
-      }
+    setDiscount(orderData.Discount ?? "0");
+    setCampañaId(orderData.Campaña_order_id ?? "");
+
+    if (orderData.details?.length) {
+      setItems(
+        orderData.details.map((d) => ({
+          name: d.name,
+          description: d.description,
+          price: d.price,
+          quantity: d.quantity,
+          image: d.image || "",
+          file: null,
+        }))
+      );
     }
   }, [orderData]);
 
@@ -55,13 +74,15 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
      CÁLCULOS
   ============================== */
   const subtotal = items.reduce(
-    (sum, i) => sum + Number(i.price || 0) * Number(i.quantity || 1),
+    (sum, item) =>
+      sum + Number(item.price || 0) * Number(item.quantity || 1),
     0
   );
+
   const total = subtotal - Number(discount || 0);
 
   /* =============================
-     HELPERS
+     MANEJO DE ITEMS
   ============================== */
   const updateItem = (index, field, value) => {
     const copy = [...items];
@@ -79,7 +100,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
     setItems(items.filter((_, i) => i !== index));
 
   /* =============================
-     SUBIR IMAGEN
+     SUBIR IMAGEN A SUPABASE
   ============================== */
   const uploadImage = async (file) => {
     if (!file) return null;
@@ -113,7 +134,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
 
       let order;
 
-      // 1️⃣ Crear o actualizar orden
+      // ✏️ EDITAR
       if (orderData?.id) {
         const { data, error } = await supabase
           .from("Order")
@@ -121,6 +142,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
             Subtotal: subtotal,
             Discount: Number(discount),
             Total: total,
+            Campaña_order_id: Number(campañaId),
           })
           .eq("id", orderData.id)
           .select()
@@ -129,8 +151,14 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
         if (error) throw error;
         order = data;
 
-        await supabase.from("order_details").delete().eq("order_id", order.id);
-      } else {
+        // eliminar detalles anteriores
+        await supabase
+          .from("order_details")
+          .delete()
+          .eq("order_id", order.id);
+      }
+      // ➕ CREAR
+      else {
         const { data, error } = await supabase
           .from("Order")
           .insert({
@@ -138,6 +166,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
             Subtotal: subtotal,
             Discount: Number(discount),
             Total: total,
+            Campaña_order_id: Number(campañaId),
           })
           .select()
           .single();
@@ -146,7 +175,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
         order = data;
       }
 
-      // 2️⃣ Detalles con imágenes
+      // 🔹 insertar detalles
       const details = [];
 
       for (const item of items) {
@@ -166,7 +195,10 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
         });
       }
 
-      const { error } = await supabase.from("order_details").insert(details);
+      const { error } = await supabase
+        .from("order_details")
+        .insert(details);
+
       if (error) throw error;
 
       onCreated();
@@ -191,7 +223,26 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
         {error && <p className="error">{error}</p>}
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <input readOnly value={subtotal} placeholder="Subtotal" />
+          {/* CAMPAÑA */}
+          <select
+            value={campañaId}
+            onChange={(e) => setCampañaId(e.target.value)}
+            required
+          >
+            <option value="">
+              {loadingCampañas
+                ? "Cargando campañas..."
+                : "Seleccionar campaña"}
+            </option>
+            {campañas.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.campaña}
+              </option>
+            ))}
+          </select>
+
+          {/* TOTALES */}
+          <input readOnly value={subtotal.toFixed(2)} placeholder="Subtotal" />
           <input
             type="number"
             placeholder="Descuento"
@@ -201,7 +252,6 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
           <input readOnly value={total.toFixed(2)} placeholder="Total" />
 
           <hr />
-
           <h3>Productos</h3>
 
           {items.map((item, i) => (
@@ -250,9 +300,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
                 }}
               />
 
-              {item.image && (
-                <img src={item.image} alt="" width={80} />
-              )}
+              {item.image && <img src={item.image} alt="" width={80} />}
 
               {items.length > 1 && (
                 <button type="button" onClick={() => removeItem(i)}>

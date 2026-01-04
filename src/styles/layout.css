@@ -7,14 +7,14 @@
 }
 
 /* SIDEBAR FIJO */
-.sidebar {
+.sidebar {  
   height: 100vh;
   overflow: hidden;
 }
 
 /* CONTENIDO PRINCIPAL */
 .layout-main {
-  padding: 0; /* ⛔ importante */
+  padding: 25px; /* ⛔ importante */
   overflow: hidden; /* 🔥 */
   background: #fff;
 

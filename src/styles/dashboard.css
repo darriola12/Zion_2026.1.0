@@ -1,0 +1,101 @@
+/* ===============================
+   DASHBOARD GRID
+================================ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* ===============================
+   BASE CARD
+================================ */
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+/* ===============================
+   CARD HEADER
+================================ */
+.dashboard-card-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+}
+
+.card-icon {
+  font-size: 1.2rem;
+}
+
+/* ===============================
+   CARD BODY
+================================ */
+.dashboard-card-body {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* ===============================
+   COMMON ROWS (reutilizable)
+================================ */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.summary-row strong {
+  font-weight: 600;
+}
+
+.text-success {
+  color: #2e7d32;
+}
+
+.text-danger {
+  color: #c62828;
+}
+
+.text-primary {
+  color: #2563eb;
+}
+
+/* ===============================
+   LIST STYLE (Campaigns, etc)
+================================ */
+.card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f9fafb;
+}
