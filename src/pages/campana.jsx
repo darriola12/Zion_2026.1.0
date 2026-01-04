@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import useCampañas from "../hooks/useCampañas";
-import CreateCampañaModal from "../models/CreateCampañaModal";
+import useCampañas from "../hooks/useCampanas";
+import CreateCampañaModal from "../models/CreateCampanamodal";
 import "../styles/campañas.css";
 
 const CampañasPage = () => {    

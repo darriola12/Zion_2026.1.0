@@ -5,7 +5,7 @@ import Missions from "./pages/Missions";
 import Customer from "./pages/Customer";
 import CustomerDetail from "./pages/CustomerDetails"; 
 import OrdersPage from "./pages/Orders";
-import CampañasPage from "./pages/campaña";
+import CampañasPage from "./pages/campana";
 
 
 
