@@ -28,7 +28,9 @@ const useOrdersResume = (customerId = null) => {
         name
       )
     )
-  `);
+  `)
+  .is("soft_deleted", null);
+;
 
 
     // ✅ filtro por customer

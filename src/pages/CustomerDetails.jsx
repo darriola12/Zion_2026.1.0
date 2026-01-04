@@ -1,30 +1,46 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../lib/superbase";
+
+// Hooks y modales
 import useOrdersResume from "../hooks/useOrder";
 import CreateOrderModal from "../models/CreateOrderModal";
 import OrderDetailsModal from "../models/CreateOrderDetailModal";
 import CreateOrderDetailsModal from "../models/CreateUpdateOrderModal";
+
+// Estilos
 import "../styles/customer.css";
 
 const Orders = () => {
-  // 👇 customerId desde URL
+  /* =========================
+     📌 PARAMS
+     ========================= */
+  // customerId viene desde la URL (/customers/:id/orders)
   const { id: customerId } = useParams();
 
-  // 👇 hook de órdenes
+  /* =========================
+     📦 DATA (HOOK)
+     ========================= */
+  // Hook que trae las órdenes del customer
   const { orders, loading, error, refetch } = useOrdersResume(customerId);
 
-  // 👇 estados de modales
+  /* =========================
+     🧠 STATES (UI)
+     ========================= */
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [orderToEdit, setOrderToEdit] = useState(null);
 
-  // ✏️ editar orden
+  /* =========================
+     ✏️ EDITAR ORDEN
+     ========================= */
   const handleEditOrder = (order) => {
     setOrderToEdit(order);
   };
 
-  // ✅ actualizar Pagado / Reportado
+  /* =========================
+     ✅ UPDATE CHECKBOX (Pagado / Reportado)
+     ========================= */
   const updateOrderStatus = async (orderId, field, value) => {
     const { error } = await supabase
       .from("Order")
@@ -35,18 +51,50 @@ const Orders = () => {
       alert("Error actualizando el estado");
       console.error(error);
     } else {
-      refetch();
+      refetch(); // 🔄 refresca SOLO orders
     }
   };
 
+  /* =========================
+     🗑️ SOFT DELETE ORDEN
+     ========================= */
+  const handleDeleteOrder = async (orderId) => {
+    const confirmDelete = window.confirm(
+      "¿Seguro que deseas eliminar esta orden?"
+    );
+
+    if (!confirmDelete) return;
+
+    const { error } = await supabase
+      .from("Order")
+      .update({
+        soft_deleted: new Date().toISOString(),
+      })
+      .eq("id", orderId);
+
+    if (error) {
+      alert("Error eliminando la orden");
+      console.error(error);
+    } else {
+      refetch(); // 🔄 refresca tabla
+    }
+  };
+
+  /* =========================
+     ⏳ STATES UI
+     ========================= */
   if (loading) return <p className="status">Cargando órdenes...</p>;
   if (error) return <p className="status error">Error: {error}</p>;
 
+  /* =========================
+     🧱 RENDER
+     ========================= */
   return (
     <div className="customer-container">
-      {/* HEADER */}
+      {/* ================= HEADER ================= */}
       <div className="customer-header">
         <h2>Orders</h2>
+
         <button
           className="btn-primary"
           onClick={() => setShowCreateModal(true)}
@@ -55,7 +103,7 @@ const Orders = () => {
         </button>
       </div>
 
-      {/* TABLE */}
+      {/* ================= TABLE ================= */}
       {orders.length === 0 ? (
         <p className="empty">Este customer no tiene órdenes registradas</p>
       ) : (
@@ -73,21 +121,26 @@ const Orders = () => {
                 <th>Reportado</th>
               </tr>
             </thead>
+
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
+                  {/* MISSION */}
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     {order.Customer?.Mission?.name || "—"}
                   </td>
 
+                  {/* SUBTOTAL */}
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     ${Number(order.Subtotal).toFixed(2)}
                   </td>
 
+                  {/* DISCOUNT */}
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     ${Number(order.Discount).toFixed(2)}
                   </td>
 
+                  {/* TOTAL */}
                   <td
                     className="bold"
                     onClick={() => setSelectedOrderId(order.id)}
@@ -95,20 +148,39 @@ const Orders = () => {
                     ${Number(order.Total).toFixed(2)}
                   </td>
 
+                  {/* FECHA */}
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
 
+                  {/* ACCIONES */}
                   <td>
-                    <button
-                      className="btn-edit"
-                      onClick={() => handleEditOrder(order)}
-                    >
-                      ✏️
-                    </button>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      {/* EDITAR */}
+                      <button
+                        className="btn-edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditOrder(order);
+                        }}
+                      >
+                        ✏️
+                      </button>
+
+                      {/* ELIMINAR */}
+                      <button
+                        className="btn-delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteOrder(order.id);
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </td>
 
-                  {/* ✅ PAGADO */}
+                  {/* PAGADO */}
                   <td>
                     <input
                       type="checkbox"
@@ -124,7 +196,7 @@ const Orders = () => {
                     />
                   </td>
 
-                  {/* ✅ REPORTADO */}
+                  {/* REPORTADO */}
                   <td>
                     <input
                       type="checkbox"
@@ -146,7 +218,9 @@ const Orders = () => {
         </div>
       )}
 
-      {/* MODAL CREAR ORDEN */}
+      {/* ================= MODALES ================= */}
+
+      {/* CREAR ORDEN */}
       {showCreateModal && (
         <CreateOrderModal
           customerId={customerId}
@@ -155,7 +229,7 @@ const Orders = () => {
         />
       )}
 
-      {/* MODAL VER DETALLES */}
+      {/* VER DETALLES */}
       {selectedOrderId && (
         <OrderDetailsModal
           orderId={selectedOrderId}
@@ -163,7 +237,7 @@ const Orders = () => {
         />
       )}
 
-      {/* MODAL EDITAR ORDEN */}
+      {/* EDITAR ORDEN */}
       {orderToEdit && (
         <CreateOrderDetailsModal
           customerId={customerId}

@@ -17,3 +17,16 @@ export const softDeleteCustomer = async (id) => {
   }
 };
 
+const softDeleteOrder = async (orderId) => {
+  const { error } = await supabase
+    .from("Order")
+    .update({
+      soft_deleted: new Date().toISOString(),
+    })
+    .eq("id", orderId);
+
+  if (error) {
+    throw error;
+  }
+}
+
