@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { supabase } from "../lib/superbase";
 import useOrdersResume from "../hooks/useOrder";
 import CreateOrderModal from "../models/CreateOrderModal";
 import OrderDetailsModal from "../models/CreateOrderDetailModal";
@@ -7,20 +8,35 @@ import CreateOrderDetailsModal from "../models/CreateUpdateOrderModal";
 import "../styles/customer.css";
 
 const Orders = () => {
-  // 👇 customerId viene desde la URL
+  // 👇 customerId desde URL
   const { id: customerId } = useParams();
 
-  // 👇 el hook filtra por customerId
+  // 👇 hook de órdenes
   const { orders, loading, error, refetch } = useOrdersResume(customerId);
 
-  // 👇 modales
+  // 👇 estados de modales
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [orderToEdit, setOrderToEdit] = useState(null);
 
-  // 👇 función para abrir modal de edición
+  // ✏️ editar orden
   const handleEditOrder = (order) => {
     setOrderToEdit(order);
+  };
+
+  // ✅ actualizar Pagado / Reportado
+  const updateOrderStatus = async (orderId, field, value) => {
+    const { error } = await supabase
+      .from("Order")
+      .update({ [field]: value })
+      .eq("id", orderId);
+
+    if (error) {
+      alert("Error actualizando el estado");
+      console.error(error);
+    } else {
+      refetch();
+    }
   };
 
   if (loading) return <p className="status">Cargando órdenes...</p>;
@@ -41,9 +57,7 @@ const Orders = () => {
 
       {/* TABLE */}
       {orders.length === 0 ? (
-        <p className="empty">
-          Este customer no tiene órdenes registradas
-        </p>
+        <p className="empty">Este customer no tiene órdenes registradas</p>
       ) : (
         <div className="table-wrapper">
           <table className="customer-table">
@@ -55,27 +69,36 @@ const Orders = () => {
                 <th>Total</th>
                 <th>Fecha</th>
                 <th>Acciones</th>
+                <th>Pagado</th>
+                <th>Reportado</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id} style={{ cursor: "pointer" }}>
-
+                <tr key={order.id}>
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     {order.Customer?.Mission?.name || "—"}
                   </td>
+
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     ${Number(order.Subtotal).toFixed(2)}
                   </td>
+
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     ${Number(order.Discount).toFixed(2)}
                   </td>
-                  <td className="bold" onClick={() => setSelectedOrderId(order.id)}>
+
+                  <td
+                    className="bold"
+                    onClick={() => setSelectedOrderId(order.id)}
+                  >
                     ${Number(order.Total).toFixed(2)}
                   </td>
+
                   <td onClick={() => setSelectedOrderId(order.id)}>
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
+
                   <td>
                     <button
                       className="btn-edit"
@@ -83,6 +106,38 @@ const Orders = () => {
                     >
                       ✏️
                     </button>
+                  </td>
+
+                  {/* ✅ PAGADO */}
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={order.Pagado}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) =>
+                        updateOrderStatus(
+                          order.id,
+                          "Pagado",
+                          e.target.checked
+                        )
+                      }
+                    />
+                  </td>
+
+                  {/* ✅ REPORTADO */}
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={order.Reportado}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) =>
+                        updateOrderStatus(
+                          order.id,
+                          "Reportado",
+                          e.target.checked
+                        )
+                      }
+                    />
                   </td>
                 </tr>
               ))}
@@ -110,9 +165,9 @@ const Orders = () => {
 
       {/* MODAL EDITAR ORDEN */}
       {orderToEdit && (
-        <CreateOrderDetailsModal 
+        <CreateOrderDetailsModal
           customerId={customerId}
-          orderData={orderToEdit} // datos iniciales para editar
+          orderData={orderToEdit}
           onClose={() => setOrderToEdit(null)}
           onCreated={refetch}
         />

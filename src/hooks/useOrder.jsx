@@ -11,22 +11,25 @@ const useOrdersResume = (customerId = null) => {
     setError(null);
 
     let query = supabase
-      .from("Order")
-      .select(`
+  .from("Order")
+  .select(`
+    id,
+    Subtotal,
+    Discount,
+    Total,
+    Pagado,
+    Reportado,
+    created_at,
+    Customer:Order_customer_id (
+      id,
+      Last_name,
+      Mission:customer_mission_id (
         id,
-        Subtotal,
-        Discount,
-        Total,
-        created_at,
-        Customer:Order_customer_id (
-          id,
-          Last_name,
-          Mission:customer_mission_id (
-            id,
-            name
-          )
-        )
-      `);
+        name
+      )
+    )
+  `);
+
 
     // ✅ filtro por customer
     if (customerId) {
