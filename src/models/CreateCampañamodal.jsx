@@ -13,7 +13,7 @@ const CreateCampañaModal = ({ onClose, onCreated }) => {
     setLoading(true);
     setError(null);
 
-    if (!name || !country) {
+    if (!campaña || !country) {
       setError("Todos los campos son obligatorios");
       setLoading(false);
       return;
