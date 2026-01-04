@@ -3,7 +3,7 @@ import { supabase } from "../lib/superbase";
 import "../styles/campañas.css";
 
 const CreateCampañaModal = ({ onClose, onCreated }) => {
-  const [name, setName] = useState("");
+  const [campaña, setCampaña] = useState("");
   const [country, setCountry] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -23,7 +23,7 @@ const CreateCampañaModal = ({ onClose, onCreated }) => {
       .from("campañas") // 👈 respeta mayúsculas si así está en Supabase
       .insert([
         {
-          campaña: name.trim(),
+          campaña: campaña.trim(),
           country: country.trim(),
         },
       ]);
@@ -57,7 +57,7 @@ const CreateCampañaModal = ({ onClose, onCreated }) => {
           <input
             type="text"
             placeholder="Nombre de la campaña"
-            value={name}
+            value={campaña}
             onChange={(e) => setName(e.target.value)}
             required
           />

@@ -41,7 +41,7 @@ const CampañasPage = () => {
             <tbody>
               {campañas.map((campaña) => (
                 <tr key={campaña.id}>
-                  <td className="bold">{campaña.name}</td>
+                  <td className="bold">{campaña.campaña}</td>
                   <td>{campaña.country || "—"}</td>
                   <td>
                     {new Date(campaña.created_at).toLocaleDateString()}
