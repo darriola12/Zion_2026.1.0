@@ -1,5 +1,5 @@
 import DashboardCard from "../ui/DashboardCard";
-import useActiveCampaigns from "../../hooks/Home/useActiveCampaigns";
+import useActiveCampaigns from "../../hooks/Home/UseActiveCampaigns";
 
 const ActiveCampaigns = () => {
   const { campaigns, loading, error } = useActiveCampaigns();
