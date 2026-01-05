@@ -10,15 +10,18 @@ const useActiveCampaigns = () => {
     const fetchCampaigns = async () => {
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from("campañas")
-        .select(`
-          id,
-          campaña,
-          Order (
-            id
-          )
-        `)
+const { data, error } = await supabase
+  .from("campañas")
+  .select(`
+    id,
+    campaña,
+    Order!inner (
+      id
+    )
+  `)
+  .is("Order.soft_deleted", null);
+// .eq("activa", true); // opcional
+    
        // .eq("activa", true); // 👈 SOLO ACTIVAS
 
       if (error) {

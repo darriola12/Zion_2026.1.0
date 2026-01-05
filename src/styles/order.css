@@ -1,77 +1,221 @@
-/* ===============================
-   DASHBOARD BASE
-================================ */
-.summary-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px 28px;
-  width: 100%;
-  max-width: 420px;
+/* =========================
+   OVERLAY
+   ========================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
 
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.06),
-    0 2px 8px rgba(0, 0, 0, 0.04);
+/* =========================
+   MODAL BOX (GRANDE)
+   ========================= */
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 30%;
+  max-width: 1400px;          /* 👈 más ancho */
+  position: relative;
+  max-height: 135vh;          /* 👈 más alto */
+  overflow-y: auto;
+}
 
+/* Modal pequeño (otros modales) */
+
+
+/* =========================
+   CERRAR MODAL
+   ========================= */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* =========================
+   FORMULARIO
+   ========================= */
+.modal-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 14px;
 }
 
-.summary-card:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 40px rgba(0, 0, 0, 0.08),
-    0 4px 12px rgba(0, 0, 0, 0.05);
+.modal-form input,
+.modal-form select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
-/* ===============================
-   HEADER
-================================ */
-.summary-card h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1f2937; /* slate-800 */
-  margin: 0;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-/* ===============================
-   ROWS
-================================ */
-.summary-row {
+/* =========================
+   PRODUCTOS (ORDER ITEMS)
+   ========================= */
+.modal-form .order-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  font-size: 0.95rem;
-  color: #374151; /* gray-700 */
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
 }
 
-.summary-row span {
-  font-weight: 500;
+.modal-form .order-item input,
+.modal-form .order-item select {
+  flex: 1 1 180px;
 }
 
-.summary-row strong {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #111827; /* gray-900 */
+/* Input file NO cortado */
+.modal-form input[type="file"] {
+  flex: 1 1 100%;
+  padding: 6px;
+  font-size: 14px;
 }
 
-/* ===============================
-   PENDING STATE
-================================ */
-.summary-row.pending strong {
-  color: #dc2626; /* red-600 */
+/* Imagen preview dentro del form */
+.modal-form .order-item img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 8px;
+  border: 1px solid #ddd;
 }
 
-/* ===============================
-   LOADING / ERROR
-================================ */
-.summary-card p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #6b7280;
+/* =========================
+   TABLA EN MODAL
+   ========================= */
+.modal-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+   margin-top: 14px;
+}
+
+.details-table {
+  width: 100%;
+  min-width: 700px;     /* 👈 más espacio */
+  border-collapse: collapse;
+}
+
+.details-table th,
+.details-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.details-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+/* Imágenes GRANDES en detalles */
+.details-table img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* =========================
+   BOTONES
+   ========================= */
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #1e40af;
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* =========================
+   ACCIONES MODAL
+   ========================= */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* =========================
+   ERRORES
+   ========================= */
+.error {
+  color: #dc2626;
+  font-size: 14px;
+}
+
+/* =========================
+   TABLA GENERAL (ORDERS / CUSTOMERS)
+   ========================= */
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customer-table th,
+.customer-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.customer-table th {
+  background-color: #f2f2f2;
+}
+
+.customer-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* =========================
+   📱 MOBILE
+   ========================= */
+@media (max-width: 768px) {
+  .modal-box {
+    width: 30%;
+    max-height: 90vh;
+    padding: 16px;
+  }
+
+  .details-table {
+    min-width: 100%;
+  }
+
+  .details-table img {
+    width: 90px;
+    height: 90px;
+  }
+
+  .modal-form .order-item {
+    flex-direction: column;
+  }
 }

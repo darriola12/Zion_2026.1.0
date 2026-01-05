@@ -1,5 +1,7 @@
 import FinancialSummary from "../components/home/FinancialSummary";
 import ActiveCampaigns from "../components/home/ActiveCampaigns";
+import SalesLast30Days from "../components/home/SalesLast30Days";
+
 import "../styles/dashboard.css";
 
 const Home = () => {
@@ -7,6 +9,7 @@ const Home = () => {
     <div className="dashboard-grid">
       <FinancialSummary />
       <ActiveCampaigns />
+      <SalesLast30Days />
       {/* futuras cards aquí */}
     </div>
   );

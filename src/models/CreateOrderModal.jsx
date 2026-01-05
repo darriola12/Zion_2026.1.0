@@ -241,16 +241,6 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
             ))}
           </select>
 
-          {/* TOTALES */}
-          <input readOnly value={subtotal.toFixed(2)} placeholder="Subtotal" />
-          <input
-            type="number"
-            placeholder="Descuento"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-          />
-          <input readOnly value={total.toFixed(2)} placeholder="Total" />
-
           <hr />
           <h3>Productos</h3>
 
@@ -288,6 +278,7 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
                 value={item.quantity}
                 onChange={(e) => updateItem(i, "quantity", e.target.value)}
               />
+              
 
               <input
                 type="file"
@@ -307,8 +298,20 @@ const CreateOrderModal = ({ customerId, orderData, onClose, onCreated }) => {
                   Eliminar
                 </button>
               )}
+              
             </div>
           ))}
+
+                    {/* TOTALES */}
+          <input readOnly value={subtotal.toFixed(2)} placeholder="Subtotal" />
+          <input
+            type="number"
+            placeholder="Descuento"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+          />
+          <input readOnly value={total.toFixed(2)} placeholder="Total" />
+
 
           <button type="button" onClick={addItem}>
             + Agregar producto
