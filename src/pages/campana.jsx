@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import useCampañas from "../hooks/useCampanas";
+import useCampañas from "../hooks/Campanas/useCampanas";
 import CreateCampañaModal from "../models/CreateCampanamodal";
 import "../styles/campañas.css";
-
+import { useNavigate } from "react-router-dom";
+  
 const CampañasPage = () => {    
   const { campañas, loading, error, refetch } = useCampañas(); // ✅ refetch
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   if (loading) return <p className="status">Cargando campañas...</p>;
   if (error) return <p className="status error">Error: {error}</p>;
-
   return (
     <div className="campañas-container">
       {/* HEADER */}
@@ -41,7 +42,12 @@ const CampañasPage = () => {
             <tbody>
               {campañas.map((campaña) => (
                 <tr key={campaña.id}>
-                  <td className="bold">{campaña.campaña}</td>
+                  <td className="bold"
+                      style={{cursor: "pointer"}}
+                      onClick={() => navigate(`/data/campañas/${campaña.id}`)}
+
+                   
+                   >{campaña.campaña}</td>
                   <td>{campaña.country || "—"}</td>
                   <td>
                     {new Date(campaña.created_at).toLocaleDateString()}

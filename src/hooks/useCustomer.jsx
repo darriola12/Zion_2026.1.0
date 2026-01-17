@@ -11,22 +11,23 @@ const useCustomer = () => {
     setError(null);
 
     const { data, error } = await supabase
-      .from("Customer")
-      .select(`
-        id,
-        Last_name,
-        Entity_data,
-        created_at,
-        customer_mission_id,
-        Mission (
-          id,
-          name
-        )
-      `)
-      .is("soft_deleted", null);
-
-
-      ;
+  .from("Customer")
+  .select(`
+    id,
+    Last_name,
+    Entity_data,
+    created_at,
+    customer_mission_id,
+    Mission (
+      id,
+      name
+    ),
+    Order (
+      id,
+      Pagado
+    )
+  `)
+  .is("soft_deleted", null);
 
     if (error) {
       setError(error.message);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/superbase";
-import useCampañas from "../hooks/useCampanas";
+import useCampañas from "../hooks/Campanas/useCampanas";
 import "../styles/order.css";
 
 /* =============================

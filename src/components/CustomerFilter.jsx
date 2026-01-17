@@ -1,10 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaFilter,
-  FaCheckCircle,
-  FaTimesCircle
-} from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaFilter } from "react-icons/fa";
 
 import useCustomer from "../hooks/useCustomer";
 import CreateCustomerModal from "../models/UseCreateCustomer";
@@ -20,24 +16,11 @@ const Customer = () => {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
-
   const [search, setSearch] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState("all"); // all | paid | unpaid
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [paymentFilter, setPaymentFilter] = useState("all"); 
+  // all | paid | unpaid
 
-  const filterRef = useRef(null);
   const navigate = useNavigate();
-
-  // 🔹 Cerrar menú al hacer click fuera
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (filterRef.current && !filterRef.current.contains(e.target)) {
-        setShowFilterMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   if (loading) return <p className="status">Cargando clientes...</p>;
   if (error) return <p className="status error">Error: {error}</p>;
@@ -69,48 +52,31 @@ const Customer = () => {
         <div className="customer-header-actions">
           <CustomerSearch value={search} onChange={setSearch} />
 
-          {/* FILTER DROPDOWN */}
-          <div className="filter-dropdown" ref={filterRef}>
+          {/* FILTRO DE PAGOS */}
+          <div className="payment-filters">
             <button
-              className="filter-btn"
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className={paymentFilter === "all" ? "active" : ""}
+              onClick={() => setPaymentFilter("all")}
+              title="Todos"
             >
-              <FaFilter />
+              <FaFilter /> Todos
             </button>
 
-            {showFilterMenu && (
-              <div className="filter-menu">
-                <button
-                  className={paymentFilter === "all" ? "active" : ""}
-                  onClick={() => {
-                    setPaymentFilter("all");
-                    setShowFilterMenu(false);
-                  }}
-                >
-                  <FaFilter /> Todos
-                </button>
+            <button
+              className={paymentFilter === "paid" ? "active paid" : ""}
+              onClick={() => setPaymentFilter("paid")}
+              title="Pagados"
+            >
+              <FaCheckCircle /> Pagados
+            </button>
 
-                <button
-                  className={paymentFilter === "paid" ? "active paid" : ""}
-                  onClick={() => {
-                    setPaymentFilter("paid");
-                    setShowFilterMenu(false);
-                  }}
-                >
-                  <FaCheckCircle /> Pagados
-                </button>
-
-                <button
-                  className={paymentFilter === "unpaid" ? "active unpaid" : ""}
-                  onClick={() => {
-                    setPaymentFilter("unpaid");
-                    setShowFilterMenu(false);
-                  }}
-                >
-                  <FaTimesCircle /> No pagados
-                </button>
-              </div>
-            )}
+            <button
+              className={paymentFilter === "unpaid" ? "active unpaid" : ""}
+              onClick={() => setPaymentFilter("unpaid")}
+              title="No pagados"
+            >
+              <FaTimesCircle /> No pagados
+            </button>
           </div>
 
           <button
@@ -197,7 +163,7 @@ const Customer = () => {
       )}
 
       {showOrderModal && selectedCustomerId && (
-        <CreateOrderModal al
+        <CreateOrderModal
           customerId={selectedCustomerId}
           onClose={() => {
             setShowOrderModal(false);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/superbase";
+import { supabase } from "../../lib/superbase";
 
 const useCampañas = () => {
   const [campañas, setCampañas] = useState([]);
