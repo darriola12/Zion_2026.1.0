@@ -7,6 +7,7 @@ import CreateCustomerModal from "../models/UseCreateCustomer";
 import CreateOrderModal from "../models/CreateOrderModal";
 import CustomerSearch from "../components/CustomerSearch";
 import { softDeleteCustomer } from "../models/deleteCustomer";
+import {} from "../styles/customer.css";
 
 import "../styles/customer.css";
 
@@ -16,11 +17,15 @@ const Customer = () => {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(""); 
   const [paymentFilter, setPaymentFilter] = useState("all"); 
   // all | paid | unpaid
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+
 
   const navigate = useNavigate();
+
+
 
   if (loading) return <p className="status">Cargando clientes...</p>;
   if (error) return <p className="status error">Error: {error}</p>;
